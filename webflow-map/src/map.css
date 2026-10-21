@@ -14,7 +14,7 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: 380px minmax(0, 1fr);
   grid-template-rows: auto 1fr;
   grid-template-areas: "top map" "list map";
   width: 100%;

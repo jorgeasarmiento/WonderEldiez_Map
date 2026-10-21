@@ -5,6 +5,13 @@
   const root = document.querySelector("[data-eldiez-map], #eldiez-map");
   if (!root || root.dataset.edmReady) return;
   root.dataset.edmReady = "1";
+  // Webflow wraps embeds in a .w-embed div that shrinks to content inside flex parents
+  // (e.g. #pickup uses align-items:flex-start), which left the map column 0px wide.
+  const wrapper = root.parentElement;
+  if (wrapper && wrapper.classList.contains("w-embed")) {
+    wrapper.style.width = "100%";
+    wrapper.style.alignSelf = "stretch";
+  }
 
   // Replaced at build time.
   const CSS = __CSS__;
