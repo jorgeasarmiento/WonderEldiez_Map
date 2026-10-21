@@ -17,21 +17,15 @@ Reemplaza el mapa de Google Maps de eldiezmexican.com (sección `#pickup`) por u
 2. En su lugar, agregar un **Embed** con el contenido de `paste/EMBED.html`:
    ```html
    <div id="eldiez-map"></div>
-   <script>
-     (function () {
-       var s = document.createElement("script");
-       s.src =
-         "https://cdn.jsdelivr.net/gh/jorgeasarmiento/WonderEldiez_Map@main/webflow-map/public/eldiez-map.js?d=" +
-         new Date().toISOString().slice(0, 10);
-       document.body.appendChild(s);
-     })();
-   </script>
+   <script
+     src="https://jorgeasarmiento.github.io/WonderEldiez_Map/webflow-map/public/eldiez-map.js"
+     defer
+   ></script>
    ```
-   El `?d=<fecha>` hace que los navegadores bajen la versión nueva como máximo un día después de un push (jsDelivr pide guardarlo 7 días).
 3. Page Settings → Custom Code → _Before `</body>` tag_: borrar el `<script src="https://maps.googleapis.com/...">` y el script con `locations`, `newLocations` e `initMap`.
 4. Publicar en staging y revisar.
 
-> **Requisito:** jsDelivr solo sirve repos **públicos**. `jorgeasarmiento/WonderEldiez_Map` hoy es privado, así que hay que hacerlo público (o mover `webflow-map/` a un repo público y cambiar `CDN_URL` en `build.mjs`).
+> **Hosting:** el script lo sirve GitHub Pages desde la rama `main` de `jorgeasarmiento/WonderEldiez_Map` (Settings → Pages → Deploy from a branch → `main` / root). El repo tiene que seguir público y con Pages activo.
 
 ## Cómo se actualiza
 
@@ -40,8 +34,7 @@ Reemplaza el mapa de Google Maps de eldiezmexican.com (sección `#pickup`) por u
 | Tiendas (alta, baja, dirección, link, fecha) | Editar el Google Sheet. Nada más.                                   |
 | Código o diseño del mapa                     | Editar `src/`, correr `vp run webflow:map`, commit y push a `main`. |
 
-jsDelivr guarda en caché `@main` hasta 12 h. Para que el CDN tome el cambio al instante después de un push, abrir:
-`https://purge.jsdelivr.net/gh/jorgeasarmiento/WonderEldiez_Map@main/webflow-map/public/eldiez-map.js`
+Después de un push, GitHub Pages publica en 1–2 minutos y los navegadores toman la versión nueva en máximo 10 minutos. No hay caché que limpiar.
 
 ## Formato del Sheet
 
@@ -60,7 +53,7 @@ El Sheet tiene que seguir compartido como "cualquier persona con el link puede v
 | `src/map.js`, `src/map.css` | Código fuente del mapa.                                                                                    |
 | `locations.json`            | Respaldo: si el Sheet no responde se usa esta lista, y de acá salen las coordenadas que el Sheet no tiene. |
 | `build.mjs`                 | Genera `public/eldiez-map.js`, `paste/EMBED.html` y `paste/preview.html`.                                  |
-| `public/eldiez-map.js`      | El archivo que sirve jsDelivr. Se commitea.                                                                |
+| `public/eldiez-map.js`      | El archivo que sirve GitHub Pages. Se commitea.                                                            |
 
 Probar en local: servir la carpeta `webflow-map/` (por ejemplo `python3 -m http.server 4599 --directory webflow-map`) y abrir `http://127.0.0.1:4599/paste/preview.html`.
 

@@ -1,5 +1,5 @@
 // Builds the El Diez locations map.
-//   webflow-map/public/eldiez-map.js  → hosted file (served by jsDelivr from GitHub)
+//   webflow-map/public/eldiez-map.js  → hosted file (served by GitHub Pages)
 //   webflow-map/paste/EMBED.html      → the single Embed pasted in Webflow
 //   webflow-map/paste/preview.html    → local test page (serve webflow-map/ and open /paste/preview.html)
 // Store data lives in the Google Sheet; locations.json is only the fallback / coordinate table.
@@ -11,8 +11,9 @@ const read = (p) => readFileSync(new URL(p, dir), "utf8");
 
 const SHEET_ID = "1TzDvvtenMzvmn6xlU-kiehZotL1nPmWW2yoGZYJ09gk";
 const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
-const CDN_URL =
-  "https://cdn.jsdelivr.net/gh/jorgeasarmiento/WonderEldiez_Map@main/webflow-map/public/eldiez-map.js";
+// GitHub Pages: live ~1 min after a push to main, browsers revalidate every 10 min.
+const SCRIPT_URL =
+  "https://jorgeasarmiento.github.io/WonderEldiez_Map/webflow-map/public/eldiez-map.js";
 
 const locations = JSON.parse(read("locations.json"));
 for (const l of locations) {
@@ -40,10 +41,8 @@ const bundle = minifySync("eldiez-map.js", source).code.trim();
 mkdirSync(new URL("public/", dir), { recursive: true });
 writeFileSync(new URL("public/eldiez-map.js", dir), `/* El Diez locations map */\n${bundle}\n`);
 
-// jsDelivr tells browsers to cache branch files for 7 days; the date in the URL makes
-// visitors pick up a new push within a day.
 const embed = `<div id="eldiez-map"></div>
-<script>(function(){var s=document.createElement("script");s.src="${CDN_URL}?d="+new Date().toISOString().slice(0,10);document.body.appendChild(s)})();</script>`;
+<script src="${SCRIPT_URL}" defer></script>`;
 
 rmSync(new URL("paste/", dir), { recursive: true, force: true });
 mkdirSync(new URL("paste/", dir), { recursive: true });
