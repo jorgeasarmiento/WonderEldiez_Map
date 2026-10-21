@@ -133,7 +133,7 @@
   background: var(--cream) !important;
 }
 .edm-acn {
-  font: 400 15px var(--display);
+  font: 400 19px var(--label);
   text-transform: uppercase;
   color: var(--ink);
 }
