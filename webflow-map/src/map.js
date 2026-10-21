@@ -141,7 +141,12 @@
   }
 
   async function loadStores() {
-    const text = await fetch(SHEET_CSV).then((r) => (r.ok ? r.text() : Promise.reject(r.status)));
+    // Google's export can be slow (5s+) or blocked on some networks; give up after 8s.
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), 8000);
+    const text = await fetch(SHEET_CSV, { signal: abort.signal })
+      .then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
+      .finally(() => clearTimeout(timer));
     const [header, ...rows] = parseCsv(text);
     const col = (re, fallback) => {
       const i = header.findIndex((h) => re.test(h.trim()));
@@ -236,6 +241,10 @@
     acIdx = -1,
     suggestTimer,
     suggestSeq = 0;
+  // Sheet data that arrived after the visitor started using the map; applied on the next reset.
+  let touched = false,
+    pendingStores = null,
+    pinIcon;
 
   function popup(s) {
     return (
@@ -337,8 +346,32 @@
     input.value = "";
     clearBtn.classList.remove("on");
     closeAC();
+    touched = false;
+    if (pendingStores) {
+      setStores(pendingStores);
+      pendingStores = null;
+    } else showStores(stores);
+  }
+
+  function setStores(list) {
+    stores = list.slice().sort((a, b) => a.name.localeCompare(b.name));
+    stores.forEach((s, i) => (s.id = i));
+    markers = stores.map((s) =>
+      L.marker([s.lat, s.lng], { icon: pinIcon, title: s.name, alt: s.name })
+        .bindPopup(popup(s), { maxWidth: 300 })
+        .on("click", () => {
+          touched = true;
+          markActive(s);
+        }),
+    );
     showStores(stores);
   }
+
+  const signature = (list) =>
+    list
+      .map((s) => [s.name, s.address, s.lat, s.lng, s.url].join("|"))
+      .sort()
+      .join("\n");
 
   // ---------- search ----------
   const matches = (q) => {
@@ -423,6 +456,7 @@
     const q = input.value.trim();
     clearBtn.classList.toggle("on", !!q);
     if (!q) return resetAll();
+    touched = true;
     const hits = matches(q);
     if (hits.length) showStores(hits);
     else {
@@ -469,7 +503,9 @@
   });
   list.addEventListener("click", (e) => {
     const card = e.target.closest(".edm-c");
-    if (card) select(stores[+card.dataset.id]);
+    if (!card) return;
+    touched = true;
+    select(stores[+card.dataset.id]);
   });
   more.addEventListener("click", () => {
     root.classList.toggle("collapsed");
@@ -478,6 +514,7 @@
       list.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
   geoBtn.addEventListener("click", () => {
+    touched = true;
     if (!navigator.geolocation) {
       geoLabel.textContent = "Location not supported";
       return;
@@ -501,10 +538,7 @@
   // ---------- map ----------
   async function init() {
     [CDN.leafletCss, CDN.clusterCss, CDN.gestureCss].forEach(loadCss);
-    const storesPromise = loadStores().catch((err) => {
-      console.warn("[El Diez map] Using bundled store list:", err);
-      return fallbackStores();
-    });
+    const sheetPromise = loadStores();
     if (!window.L) await loadJs(CDN.leafletJs);
     L = window.L;
     if (!L.markerClusterGroup) await loadJs(CDN.clusterJs);
@@ -548,22 +582,27 @@
     });
     map.addLayer(cluster);
 
-    stores = (await storesPromise).sort((a, b) => a.name.localeCompare(b.name));
-    stores.forEach((s, i) => (s.id = i));
-    const pinIcon = L.divIcon({
+    pinIcon = L.divIcon({
       html: `<div class="edm-mk">${PIN}</div>`,
       iconSize: [30, 41],
       iconAnchor: [15, 41],
       popupAnchor: [0, -38],
       className: "",
     });
-    markers = stores.map((s) =>
-      L.marker([s.lat, s.lng], { icon: pinIcon, title: s.name, alt: s.name })
-        .bindPopup(popup(s), { maxWidth: 300 })
-        .on("click", () => markActive(s)),
-    );
-    showStores(stores);
+    map.on("dragstart", () => (touched = true));
+
+    // Show the bundled list right away, then swap in the Sheet when it arrives.
+    const bundled = fallbackStores();
+    setStores(bundled);
     $(".edm-load").classList.add("off");
+    sheetPromise.then(
+      (fresh) => {
+        if (signature(fresh) === signature(bundled)) return;
+        if (touched) pendingStores = fresh;
+        else setStores(fresh);
+      },
+      (err) => console.warn("[El Diez map] Sheet unavailable, using bundled store list:", err),
+    );
   }
 
   init().catch((err) => {
