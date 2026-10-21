@@ -11,7 +11,8 @@
     "db:migrate": "vp run api#db:migrate",
     "db:push": "vp run api#db:push",
     "db:studio": "vp run api#db:studio",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "prepare": "git config core.hooksPath .githooks || true",
+    "webflow:map": "node webflow-map/build.mjs"
   },
   "devDependencies": {
     "vite-plus": "catalog:"

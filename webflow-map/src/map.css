@@ -1,0 +1,443 @@
+/* Scoped under .edm so nothing leaks into Webflow. Fonts are the ones eldiezmexican.com already loads. */
+.edm {
+  --blue: #008ff5;
+  --red: #ff151a;
+  --orange: #ffa500;
+  --cream: #fdf2ea;
+  --cream-2: #f6e4d6;
+  --ink: #392b1d;
+  --display: "Salsa Grande", "Arial Black", sans-serif;
+  --label: Taybenditos, "Arial Narrow", sans-serif;
+  --button: Signpainter, "Brush Script MT", cursive;
+  --body: instrument-sans-variable, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --address: americane, instrument-sans-variable, sans-serif;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "top map" "list map";
+  width: 100%;
+  height: 720px;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--body);
+  text-align: left;
+  overflow: hidden;
+}
+.edm *,
+.edm *::before,
+.edm *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.edm button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* Search + location + count */
+.edm-top {
+  grid-area: top;
+  background: var(--cream);
+  border-right: 2px solid var(--blue);
+  z-index: 3;
+}
+.edm-search {
+  position: relative;
+  padding: 16px;
+}
+.edm-si {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px;
+  border: 2px solid var(--blue);
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink);
+  font: 500 15px var(--body);
+  outline: none;
+  -webkit-appearance: none;
+}
+.edm-si:focus {
+  box-shadow: 0 0 0 3px rgba(0, 143, 245, 0.2);
+}
+.edm-si::placeholder {
+  color: #9a8b7d;
+}
+.edm-sico {
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  fill: var(--blue);
+  pointer-events: none;
+}
+.edm-clear {
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  transform: translateY(-50%);
+  font-size: 22px !important;
+  line-height: 1;
+  color: var(--blue) !important;
+  display: none;
+}
+.edm-clear.on {
+  display: block;
+}
+.edm-ac {
+  position: absolute;
+  top: calc(100% - 14px);
+  left: 16px;
+  right: 16px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: #fff;
+  border: 2px solid var(--blue);
+  border-top: 0;
+  box-shadow: 0 10px 24px rgba(57, 43, 29, 0.15);
+  z-index: 10;
+  display: none;
+}
+.edm-ac.open {
+  display: block;
+}
+.edm-ach {
+  padding: 8px 14px 4px;
+  font: 400 13px var(--label);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.edm-aci {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--cream-2) !important;
+}
+.edm-aci:last-child {
+  border-bottom: 0 !important;
+}
+.edm-aci:hover,
+.edm-aci.act {
+  background: var(--cream) !important;
+}
+.edm-acn {
+  font: 400 15px var(--display);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.edm-aca {
+  font: 400 13px var(--body);
+  color: #7d6c5c;
+  margin-top: 1px;
+}
+.edm-aci mark {
+  background: none;
+  color: var(--blue);
+}
+.edm-geo {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: calc(100% - 32px);
+  margin: 0 16px 14px;
+  padding: 12px 16px 8px !important;
+  background: var(--red) !important;
+  color: #fff !important;
+  font: 400 22px var(--button) !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: filter 0.2s;
+}
+.edm-geo:hover {
+  filter: brightness(1.08);
+}
+.edm-geo svg {
+  width: 20px;
+  height: 20px;
+  margin-top: -4px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+.edm-cnt {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 8px;
+  background: var(--blue);
+  color: var(--cream);
+  font: 400 16px var(--label);
+  text-transform: uppercase;
+}
+.edm-cnt b {
+  font-weight: 400;
+  color: #fff;
+}
+.edm-sort {
+  font-size: 13px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* Store list */
+.edm-listw {
+  grid-area: list;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid var(--blue);
+  background: var(--cream);
+  z-index: 2;
+}
+.edm-list {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.edm-list::-webkit-scrollbar {
+  width: 6px;
+}
+.edm-list::-webkit-scrollbar-thumb {
+  background: var(--blue);
+}
+.edm-c {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px !important;
+  border-bottom: 1px solid var(--cream-2) !important;
+  transition: background 0.15s;
+}
+.edm-c:hover {
+  background: #fff !important;
+}
+.edm-c.on {
+  background: var(--blue) !important;
+  color: #fff !important;
+}
+.edm-cico {
+  flex-shrink: 0;
+  width: 22px;
+  display: flex;
+  justify-content: center;
+}
+.edm-cinf {
+  flex: 1;
+  min-width: 0;
+}
+.edm-cn {
+  font: 400 22px/1.05 var(--label);
+  text-transform: uppercase;
+  color: var(--blue);
+}
+.edm-c.on .edm-cn {
+  color: #fff;
+}
+.edm-ca {
+  font: 300 15px/1.3 var(--address);
+  margin-top: 3px;
+  opacity: 0.85;
+}
+.edm-cd {
+  flex-shrink: 0;
+  font: 400 15px var(--label);
+  color: var(--red);
+}
+.edm-c.on .edm-cd {
+  color: #fff;
+}
+.edm-empty {
+  padding: 28px 16px;
+  font: 400 15px var(--body);
+  text-align: center;
+  color: #7d6c5c;
+}
+.edm-more {
+  display: none;
+}
+
+/* Map, pins, clusters, popup */
+.edm-map {
+  grid-area: map;
+  position: relative;
+  min-height: 0;
+  z-index: 1;
+}
+.edm-map .leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #e9e7e3;
+  font-family: var(--body);
+}
+.edm-mk {
+  cursor: pointer;
+  transition: transform 0.2s;
+  transform-origin: 50% 100%;
+}
+.edm-mk:hover {
+  transform: scale(1.2);
+}
+.edm-cl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--blue);
+  border: 3px solid var(--cream);
+  box-shadow: 0 3px 10px rgba(57, 43, 29, 0.3);
+  color: #fff;
+  font: 400 19px var(--label);
+  padding-top: 2px;
+  transition: transform 0.2s;
+}
+.edm-cl:hover {
+  transform: scale(1.1);
+}
+.edm-map .leaflet-popup-content-wrapper {
+  border-radius: 0;
+  background: var(--blue);
+  color: #fff;
+  padding: 0;
+  box-shadow: -4px 6px 24px rgba(0, 0, 0, 0.25);
+}
+.edm-map .leaflet-popup-tip {
+  background: var(--blue);
+}
+.edm-map .leaflet-popup-content {
+  margin: 0;
+  width: 280px !important;
+}
+.edm-map a.leaflet-popup-close-button {
+  color: #fff;
+  font-size: 22px;
+  top: 6px;
+  right: 6px;
+}
+.edm-pop {
+  padding: 22px 22px 20px;
+}
+.edm-pt {
+  font: 400 34px/1 var(--label);
+  text-transform: uppercase;
+  color: #fff;
+  padding-right: 16px;
+}
+.edm-pa {
+  font: 300 18px/1.3 var(--address);
+  color: #fff;
+  margin: 10px 0 16px;
+}
+.edm-po {
+  display: inline-block;
+  padding: 12px 22px 8px;
+  background: var(--cream);
+  color: var(--blue) !important;
+  font: 400 22px var(--button);
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+.edm-po:hover {
+  transform: translateY(-2px);
+}
+.edm-me {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 6px rgba(255, 21, 26, 0.25);
+}
+.edm-load {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 400 22px var(--label);
+  color: var(--blue);
+  text-transform: uppercase;
+  z-index: 1000;
+  background: var(--cream);
+  transition: opacity 0.3s;
+}
+.edm-load.off {
+  opacity: 0;
+  pointer-events: none;
+}
+.edm .leaflet-container::after {
+  font-family: var(--label);
+  font-size: 22px;
+  text-transform: uppercase;
+  text-align: center;
+  background: rgba(0, 143, 245, 0.75);
+}
+
+/* Mobile: search on top, map, then a collapsible list */
+@media (max-width: 768px) {
+  .edm {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 380px auto;
+    grid-template-areas: "top" "map" "list";
+    height: auto;
+  }
+  .edm-top,
+  .edm-listw {
+    border-right: 0;
+  }
+  .edm-search {
+    padding: 12px;
+  }
+  .edm-sico {
+    left: 26px;
+  }
+  .edm-clear {
+    right: 22px;
+  }
+  .edm-ac {
+    left: 12px;
+    right: 12px;
+    top: calc(100% - 10px);
+  }
+  .edm-geo {
+    width: calc(100% - 24px);
+    margin: 0 12px 12px;
+  }
+  .edm-list {
+    max-height: 330px;
+  }
+  .edm.collapsed .edm-list {
+    max-height: 258px;
+    overflow: hidden;
+  }
+  .edm-more {
+    display: block;
+    width: 100%;
+    padding: 14px 16px 10px !important;
+    background: var(--blue) !important;
+    color: #fff !important;
+    font: 400 20px var(--button) !important;
+    text-transform: uppercase;
+  }
+  .edm-pt {
+    font-size: 30px;
+  }
+  .edm-map .leaflet-popup-content {
+    width: 240px !important;
+  }
+}
