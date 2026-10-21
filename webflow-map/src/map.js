@@ -206,10 +206,10 @@
         <feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>
         <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 0 0 .1 .3 .5 .93 1"/><feFuncG type="table" tableValues=".35 .4 .45 .5 .55 .6 .65 .7 .75 .965 1"/><feFuncB type="table" tableValues=".6 .65 .7 .75 .8 .85 .9 .93 .96 1 1"/></feComponentTransfer>
       </filter>
-      <!-- Label text (~0.19) → brand blue #008FF5, white halo stays white. -->
+      <!-- Label text (~0.19) → dark navy #003A73, white halo stays white. -->
       <filter id="edm-labels" color-interpolation-filters="sRGB">
         <feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>
-        <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 .15 .3 .45 .6 .75 .9 1"/><feFuncG type="table" tableValues=".5 .53 .561 .561 .62 .68 .74 .8 .86 .93 1"/><feFuncB type="table" tableValues=".9 .94 .961 .961 .97 .97 .98 .98 .99 .99 1"/></feComponentTransfer>
+        <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 .15 .3 .45 .6 .75 .9 1"/><feFuncG type="table" tableValues=".2 .22 .227 .227 .33 .44 .55 .66 .77 .89 1"/><feFuncB type="table" tableValues=".4 .43 .45 .45 .53 .61 .69 .77 .85 .93 1"/></feComponentTransfer>
       </filter>
     </svg>`;
   const $ = (sel) => root.querySelector(sel);
