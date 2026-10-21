@@ -204,7 +204,7 @@
       <!-- Esri grays: water ~0.82, land ~0.92, roads 1. Water → mid blue, land → near-white blue. -->
       <filter id="edm-land" color-interpolation-filters="sRGB">
         <feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>
-        <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 0 0 .1 .3 .5 .93 1"/><feFuncG type="table" tableValues=".35 .4 .45 .5 .55 .6 .65 .7 .75 .965 1"/><feFuncB type="table" tableValues=".6 .65 .7 .75 .8 .85 .9 .93 .96 1 1"/></feComponentTransfer>
+        <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 0 0 .1 .3 .6 .93 1"/><feFuncG type="table" tableValues=".35 .4 .45 .5 .55 .6 .65 .7 .8 .965 1"/><feFuncB type="table" tableValues=".6 .65 .7 .75 .8 .85 .9 .93 .97 1 1"/></feComponentTransfer>
       </filter>
       <!-- Label text (~0.19) → dark navy #003A73, white halo stays white. -->
       <filter id="edm-labels" color-interpolation-filters="sRGB">
