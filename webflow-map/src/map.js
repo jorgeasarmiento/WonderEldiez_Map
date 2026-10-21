@@ -201,9 +201,15 @@
     <div class="edm-listw"><div class="edm-list"></div><button type="button" class="edm-more"></button></div>
     <div class="edm-map"><div class="edm-mapc"></div><div class="edm-load">Loading locations…</div></div>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-      <filter id="edm-duo" color-interpolation-filters="sRGB">
+      <!-- Esri grays: water ~0.82, land ~0.92, roads 1. Water → mid blue, land → near-white blue. -->
+      <filter id="edm-land" color-interpolation-filters="sRGB">
         <feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>
-        <feComponentTransfer><feFuncR type="table" tableValues="0 .88"/><feFuncG type="table" tableValues=".22 .94"/><feFuncB type="table" tableValues=".55 1"/></feComponentTransfer>
+        <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 0 0 .1 .3 .5 .93 1"/><feFuncG type="table" tableValues=".35 .4 .45 .5 .55 .6 .65 .7 .75 .965 1"/><feFuncB type="table" tableValues=".6 .65 .7 .75 .8 .85 .9 .93 .96 1 1"/></feComponentTransfer>
+      </filter>
+      <!-- Label text (~0.19) → brand blue #008FF5, white halo stays white. -->
+      <filter id="edm-labels" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>
+        <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 .15 .3 .45 .6 .75 .9 1"/><feFuncG type="table" tableValues=".5 .53 .561 .561 .62 .68 .74 .8 .86 .93 1"/><feFuncB type="table" tableValues=".9 .94 .961 .961 .97 .97 .98 .98 .99 .99 1"/></feComponentTransfer>
       </filter>
     </svg>`;
   const $ = (sel) => root.querySelector(sel);
