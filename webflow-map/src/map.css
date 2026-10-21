@@ -281,8 +281,13 @@
 .edm-map .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #e9e7e3;
+  background: #e0f0ff;
   font-family: var(--body);
+}
+/* Duotone the grayscale Esri tiles and labels into the site's blue (filter defined in map.js). */
+.edm-map .leaflet-tile-pane,
+.edm-map .leaflet-shadow-pane {
+  filter: url(#edm-duo);
 }
 .edm-mk {
   cursor: pointer;
