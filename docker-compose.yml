@@ -1,0 +1,33 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-3001}:3001"
+    volumes:
+      - db_data:/storage/db
+      - uploads_data:/storage/uploads
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3001}
+      DB_PATH: /storage/db/db.sqlite
+      UPLOADS_PATH: /storage/uploads
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3001}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-changeme-use-a-real-secret-in-production}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:${PORT:-3001}/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+# Named volumes — data persists across container restarts and rebuilds.
+# In Coolify, these are managed automatically.
+# Locally, inspect with: docker volume inspect debrain-ai-template_db_data
+volumes:
+  db_data:
+    driver: local
+  uploads_data:
+    driver: local

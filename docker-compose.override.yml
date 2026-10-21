@@ -1,0 +1,8 @@
+# Local development overrides (auto-loaded by docker compose).
+# Uses bind mounts so you can see and edit files directly in ./storage/.
+# This file should NOT be deployed to production.
+services:
+  api:
+    volumes:
+      - ./storage/db:/storage/db
+      - ./storage/uploads:/storage/uploads

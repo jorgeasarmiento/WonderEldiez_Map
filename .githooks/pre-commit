@@ -1,0 +1,3 @@
+#!/bin/sh
+# Auto-format staged files before commit (never blocks)
+vp fmt && git add -u

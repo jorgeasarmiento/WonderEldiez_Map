@@ -1,0 +1,26 @@
+# Nixpacks build configuration for Coolify
+# Docs: https://nixpacks.com/docs/configuration/file
+
+[phases.setup]
+# Node.js 24 + native build tools required by better-sqlite3
+nixPkgs = ["nodejs_24", "python3", "gcc", "gnumake"]
+
+[phases.install]
+cmds = [
+  "corepack enable",
+  "corepack prepare pnpm@10.33.0 --activate",
+  "pnpm install --frozen-lockfile",
+]
+cacheDirectories = ["/root/.local/share/pnpm/store"]
+
+[phases.build]
+# Build Vue frontend (vp resolves from node_modules/.bin via pnpm run)
+cmds = ["pnpm --filter=website run build"]
+
+[start]
+cmd = "node apps/api/src/index.ts"
+
+[variables]
+NODE_ENV = "production"
+DB_PATH = "/storage/db/db.sqlite"
+UPLOADS_PATH = "/storage/uploads"

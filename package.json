@@ -1,0 +1,29 @@
+{
+  "name": "debrain-ai-template",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ready": "vp fmt && vp lint && vp run test -r && vp run build -r",
+    "dev": "vp run api#dev & vp run website#dev",
+    "cleanup": "node scripts/cleanup-boilerplate.js",
+    "db:generate": "vp run api#db:generate",
+    "db:migrate": "vp run api#db:migrate",
+    "db:push": "vp run api#db:push",
+    "db:studio": "vp run api#db:studio",
+    "prepare": "git config core.hooksPath .githooks || true"
+  },
+  "devDependencies": {
+    "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
+  }
+}

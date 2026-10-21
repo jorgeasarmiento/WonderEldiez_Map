@@ -1,0 +1,20 @@
+node_modules
+**/node_modules
+.git
+.github
+.vscode
+.vite-hooks
+
+# Runtime data — mounted as volumes at runtime, never baked into the image
+storage/
+inbox/
+
+# Build outputs
+**/dist
+**/.cache
+
+# Dev files
+**/*.md
+.env*
+!.env.example
+docker-compose.override.yml
