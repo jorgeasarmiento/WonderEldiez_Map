@@ -151,9 +151,9 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: calc(100% - 32px);
-  margin: 0 16px 14px;
-  padding: 12px 16px 8px !important;
+  width: fit-content;
+  margin: 0 auto 14px;
+  padding: 12px 28px 8px !important;
   background: var(--red) !important;
   color: #fff !important;
   font: 400 22px var(--button) !important;
@@ -422,8 +422,8 @@
     top: calc(100% - 10px);
   }
   .edm-geo {
-    width: calc(100% - 24px);
-    margin: 0 12px 12px;
+    width: fit-content;
+    margin: 0 auto 12px;
   }
   .edm-list {
     max-height: 330px;
