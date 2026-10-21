@@ -40,8 +40,10 @@ const bundle = minifySync("eldiez-map.js", source).code.trim();
 mkdirSync(new URL("public/", dir), { recursive: true });
 writeFileSync(new URL("public/eldiez-map.js", dir), `/* El Diez locations map */\n${bundle}\n`);
 
+// jsDelivr tells browsers to cache branch files for 7 days; the date in the URL makes
+// visitors pick up a new push within a day.
 const embed = `<div id="eldiez-map"></div>
-<script src="${CDN_URL}" defer></script>`;
+<script>(function(){var s=document.createElement("script");s.src="${CDN_URL}?d="+new Date().toISOString().slice(0,10);document.body.appendChild(s)})();</script>`;
 
 rmSync(new URL("paste/", dir), { recursive: true, force: true });
 mkdirSync(new URL("paste/", dir), { recursive: true });

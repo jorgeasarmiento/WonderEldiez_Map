@@ -17,11 +17,17 @@ Reemplaza el mapa de Google Maps de eldiezmexican.com (sección `#pickup`) por u
 2. En su lugar, agregar un **Embed** con el contenido de `paste/EMBED.html`:
    ```html
    <div id="eldiez-map"></div>
-   <script
-     src="https://cdn.jsdelivr.net/gh/jorgeasarmiento/WonderEldiez_Map@main/webflow-map/public/eldiez-map.js"
-     defer
-   ></script>
+   <script>
+     (function () {
+       var s = document.createElement("script");
+       s.src =
+         "https://cdn.jsdelivr.net/gh/jorgeasarmiento/WonderEldiez_Map@main/webflow-map/public/eldiez-map.js?d=" +
+         new Date().toISOString().slice(0, 10);
+       document.body.appendChild(s);
+     })();
+   </script>
    ```
+   El `?d=<fecha>` hace que los navegadores bajen la versión nueva como máximo un día después de un push (jsDelivr pide guardarlo 7 días).
 3. Page Settings → Custom Code → _Before `</body>` tag_: borrar el `<script src="https://maps.googleapis.com/...">` y el script con `locations`, `newLocations` e `initMap`.
 4. Publicar en staging y revisar.
 
@@ -34,7 +40,7 @@ Reemplaza el mapa de Google Maps de eldiezmexican.com (sección `#pickup`) por u
 | Tiendas (alta, baja, dirección, link, fecha) | Editar el Google Sheet. Nada más.                                   |
 | Código o diseño del mapa                     | Editar `src/`, correr `vp run webflow:map`, commit y push a `main`. |
 
-jsDelivr guarda en caché `@main` hasta 12 h. Para publicar al instante después de un push, abrir:
+jsDelivr guarda en caché `@main` hasta 12 h. Para que el CDN tome el cambio al instante después de un push, abrir:
 `https://purge.jsdelivr.net/gh/jorgeasarmiento/WonderEldiez_Map@main/webflow-map/public/eldiez-map.js`
 
 ## Formato del Sheet
