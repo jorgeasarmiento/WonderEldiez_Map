@@ -327,11 +327,16 @@
   margin: 0;
   width: 280px !important;
 }
-.edm-map a.leaflet-popup-close-button {
+/* Extra .edm so this beats Leaflet's own gray close button (its stylesheet loads after ours). */
+.edm .edm-map a.leaflet-popup-close-button {
   color: var(--on-primary);
   font-size: 22px;
   top: 6px;
   right: 6px;
+}
+.edm .edm-map a.leaflet-popup-close-button:hover {
+  color: var(--on-primary);
+  opacity: 0.75;
 }
 .edm-pop {
   padding: 22px 22px 20px;
