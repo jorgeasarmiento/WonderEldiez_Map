@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Pop Salad Map Preview</title>
+    <!-- Local stand-in for popsalad.com. The site uses Futura from Typekit (domain-locked);
+         locally the theme falls back to the system Futura. -->
+    <style>
+      body {
+        margin: 0;
+        background: #ffe44a;
+      }
+      section {
+        padding: 60px 40px;
+        background: #ffe44a;
+        font-family: futura-pt, Futura, sans-serif;
+        font-style: italic;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #0602f5;
+      }
+    </style>
+  </head>
+  <body>
+    <section>
+      <div style="font-size: 44px; line-height: 1">Order delivery or pickup at Wonder</div>
+    </section>
+    {{MAP}}
+    <section><div style="font-size: 40px">Or find us at:</div></section>
+    <section><div style="height: 60vh"></div></section>
+  </body>
+</html>

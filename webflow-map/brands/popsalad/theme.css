@@ -1,0 +1,105 @@
+/* Pop Salad theme: colors and Futura (Typekit) that popsalad.com already loads.
+   Layout lives in src/base.css; the rules below the variables are Pop Salad touches. */
+.edm {
+  --primary: #0602f5;
+  --accent: #ff9536;
+  --bg: #ffe44a;
+  --line: #f0cf2a;
+  --ink: #111;
+  --muted: #5e5320;
+  --placeholder: #8a8467;
+  --surface: #fff;
+  --on-primary: #ffe44a;
+  --on-accent: #fdf2cd;
+  --map-bg: #fff9de;
+  --shadow-soft: rgba(0, 0, 0, 0.15);
+  --shadow-strong: rgba(0, 0, 0, 0.3);
+  --me-halo: rgba(6, 2, 245, 0.25);
+  --gesture-overlay: rgba(6, 2, 245, 0.75);
+  --pin-1: #000;
+  --pin-2: #ffe44a;
+  --pin-on-1: #000;
+  --pin-on-2: #ffe44a;
+
+  --label: futura-pt, Futura, "Trebuchet MS", sans-serif;
+  --button: futura-pt, Futura, "Trebuchet MS", sans-serif;
+  --body: futura-pt, Futura, "Trebuchet MS", sans-serif;
+  --address: futura-pt, Futura, "Trebuchet MS", sans-serif;
+}
+
+/* Headings and buttons: Futura extra-bold italic, like the site's titles. */
+.edm .edm-cn,
+.edm .edm-pt,
+.edm .edm-cnt,
+.edm .edm-ach,
+.edm .edm-acn,
+.edm .edm-cd,
+.edm .edm-cl,
+.edm .edm-load,
+.edm .edm-po {
+  font-style: italic;
+  font-weight: 800;
+}
+.edm .edm-ca,
+.edm .edm-pa {
+  font-weight: 400;
+}
+
+/* Onion pin outline. */
+.edm .edm-pin-2 {
+  stroke: #000;
+  stroke-miterlimit: 10;
+}
+
+/* Pill buttons with the site's black offset shadow. */
+.edm .edm-geo {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-radius: 31px;
+  box-shadow: -8px 10px 0 -2px #000;
+  font-style: italic !important;
+  font-weight: 800 !important;
+  font-size: 17px !important;
+  padding: 12px 28px !important;
+  margin-bottom: 22px;
+}
+.edm .edm-po {
+  background: var(--accent);
+  color: var(--on-accent) !important;
+  border-radius: 50px;
+  font-size: 18px;
+  padding: 12px 24px;
+}
+.edm .edm-more {
+  font-style: italic !important;
+  font-weight: 800 !important;
+}
+
+/* List items: white by default, yellow on hover (reverse of the shared layout). */
+.edm .edm-c {
+  background: var(--surface) !important;
+}
+.edm .edm-c:hover {
+  background: var(--bg) !important;
+}
+.edm .edm-c.on {
+  background: var(--primary) !important;
+}
+
+/* Clusters: blue with yellow number and a hard black shadow. */
+.edm .edm-cl {
+  background: var(--primary);
+  color: var(--bg);
+  border: 2px solid #000;
+  box-shadow: -3px 4px 0 0 #000;
+  padding-top: 0;
+}
+
+/* Search field: black outline to match the site's flat graphic style. */
+.edm .edm-si {
+  border: 2px solid #000;
+  border-radius: 31px;
+}
+.edm .edm-ac {
+  border-color: #000;
+}

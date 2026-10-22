@@ -2,9 +2,10 @@
 
 Un solo motor de mapa (Leaflet) y una carpeta por marca. Cada marca genera su propio script y su propio Embed para Webflow; todas comparten las mismas funciones y arreglos.
 
-| Marca   | Sitio             | Contenedor    | Script                                                                              |
-| ------- | ----------------- | ------------- | ----------------------------------------------------------------------------------- |
-| El Diez | eldiezmexican.com | `#eldiez-map` | https://jorgeasarmiento.github.io/WonderEldiez_Map/webflow-map/public/eldiez-map.js |
+| Marca     | Sitio             | Contenedor      | Script                                                                                |
+| --------- | ----------------- | --------------- | ------------------------------------------------------------------------------------- |
+| El Diez   | eldiezmexican.com | `#eldiez-map`   | https://jorgeasarmiento.github.io/WonderEldiez_Map/webflow-map/public/eldiez-map.js   |
+| Pop Salad | popsalad.com      | `#popsalad-map` | https://jorgeasarmiento.github.io/WonderEldiez_Map/webflow-map/public/popsalad-map.js |
 
 Qué hace el mapa:
 
@@ -53,7 +54,7 @@ Probar en local: servir `webflow-map/` (por ejemplo `python3 -m http.server 4599
      defer
    ></script>
    ```
-2. Borrar el mapa anterior y sus scripts. En El Diez: el div `#eldiez-map` (`tot-map-container`), el aviso `#click`, el `<script src="https://maps.googleapis.com/...">` y el script con `locations`, `newLocations` e `initMap`.
+2. Borrar el mapa anterior y sus scripts. En los dos sitios es el mismo: el div `#eldiez-map` (`tot-map-container`), el aviso `#click`, el `<script src="https://maps.googleapis.com/...">` y el script con `locations`, `newLocations` e `initMap`.
 3. Publicar en staging y revisar.
 
 > **Hosting:** GitHub Pages sirve los scripts desde la rama `main` de `jorgeasarmiento/WonderEldiez_Map` (Settings → Pages → Deploy from a branch → `main` / root). El repo tiene que seguir público y con Pages activo. Después de un push, Pages publica en 1–2 minutos y los navegadores toman la versión nueva en máximo 10.
@@ -74,12 +75,12 @@ Probar en local: servir `webflow-map/` (por ejemplo `python3 -m http.server 4599
 | Diseño o textos de una marca                 | Editar `brands/<id>/`, `vp run webflow:map`, commit y push a `main`. |
 | Funciones del mapa (todas las marcas)        | Editar `src/`, `vp run webflow:map`, commit y push a `main`.         |
 
-## Formato del Sheet (El Diez)
+## Formato del Sheet (El Diez y Pop Salad)
 
 Pestaña _Pickup_ (`gid=0`). Columnas por nombre de encabezado (configurables en `brand.mjs → columns`):
 
 - `Launch Date`: `Live` o fecha (`4/22` o `5/8/2026`). Fechas futuras se ocultan hasta ese día.
-- `Location Title`, `Address`, `El Diez URL`: obligatorias; filas sin alguna de ellas se ignoran.
+- `Location Title`, `Address` y la URL de la marca (`El Diez URL` o `Pop Salad URL`): obligatorias; filas sin alguna de ellas se ignoran.
 - `Latitude`, `Longitude`: opcionales. Hoy esas columnas no tienen encabezado (el mapa usa las columnas F y G). Si faltan, usa las coordenadas de `locations.json`; si la tienda es nueva, geocodifica la dirección.
 
 El Sheet tiene que estar compartido como "cualquier persona con el link puede ver".
