@@ -17,6 +17,9 @@ export default {
     lng: { match: "^(lng|lon)", fallback: 6 },
   },
 
+  // true: the list only shows the stores visible on the map (opening a cluster narrows it).
+  listFollowsMap: false,
+
   text: {
     searchPlaceholder: "Search by zip, city or store",
     clearSearch: "Clear search",
@@ -34,6 +37,7 @@ export default {
     stores: "Stores",
     searchNear: "Search near",
     noMatch: "No stores match. Press Enter to search that area.",
+    noneInView: "No stores in this part of the map. Zoom out to see more.",
     notFound: "We couldn't find “{q}”. Try a zip code or city.",
     order: "Pick up or delivery",
     loading: "Loading locations…",

@@ -247,7 +247,8 @@
   // Sheet data that arrived after the visitor started using the map; applied on the next reset.
   let touched = false,
     pendingStores = null,
-    pinIcon;
+    pinIcon,
+    activeId = null;
 
   function popup(s) {
     return (
@@ -257,7 +258,14 @@
   }
 
   function renderList() {
-    const items = visible.slice();
+    let items = visible.slice(),
+      outOfView = false;
+    // Optionally list only the stores currently on screen, so opening a cluster narrows the list.
+    if (BRAND.listFollowsMap && map && items.length) {
+      const bounds = map.getBounds();
+      items = items.filter((s) => bounds.contains([s.lat, s.lng]));
+      outOfView = !items.length;
+    }
     if (origin) items.sort((a, b) => miles(origin, a) - miles(origin, b));
     else items.sort((a, b) => a.name.localeCompare(b.name));
     $(".edm-n").textContent = items.length;
@@ -273,15 +281,18 @@
               "</button>",
           )
           .join("")
-      : `<div class="edm-empty">${esc(T("noMatch"))}</div>`;
+      : `<div class="edm-empty">${esc(T(outOfView ? "noneInView" : "noMatch"))}</div>`;
     more.style.display = items.length > 3 ? "" : "none";
     more.textContent = root.classList.contains("collapsed")
       ? T("viewAll", { n: items.length })
       : T("showLess");
     list.scrollTop = 0;
+    const active = stores[activeId];
+    if (active) markActive(active);
   }
 
   function markActive(s) {
+    activeId = s.id;
     list.querySelectorAll(".edm-c.on").forEach((e) => e.classList.remove("on"));
     const card = list.querySelector(`[data-id="${s.id}"]`);
     if (!card) return;
@@ -346,6 +357,7 @@
     clearBtn.classList.remove("on");
     closeAC();
     touched = false;
+    activeId = null;
     if (pendingStores) {
       setStores(pendingStores);
       pendingStores = null;
@@ -589,6 +601,7 @@
       className: "",
     });
     map.on("dragstart", () => (touched = true));
+    if (BRAND.listFollowsMap) map.on("moveend", renderList);
 
     // Show the bundled list right away, then swap in the Sheet when it arrives.
     const bundled = fallbackStores();

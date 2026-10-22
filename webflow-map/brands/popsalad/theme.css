@@ -75,6 +75,11 @@
   font-weight: 800 !important;
 }
 
+/* List area white too, so the strip beside the scrollbar isn't yellow. */
+.edm .edm-listw {
+  background: var(--surface);
+}
+
 /* List items: white by default, yellow on hover (reverse of the shared layout). */
 .edm .edm-c {
   background: var(--surface) !important;
@@ -95,9 +100,8 @@
   padding-top: 0;
 }
 
-/* Search field: black outline to match the site's flat graphic style. */
+/* Search field: rounded, no outline. */
 .edm .edm-si {
-  border: 2px solid #000;
   border-radius: 31px;
 }
 .edm .edm-ac {
