@@ -1,16 +1,6 @@
-/* Scoped under .edm so nothing leaks into Webflow. Fonts are the ones eldiezmexican.com already loads. */
+/* Shared map layout, scoped under .edm so nothing leaks into Webflow.
+   Colors and fonts come from each brand's theme.css (custom properties on .edm). */
 .edm {
-  --blue: #008ff5;
-  --red: #ff151a;
-  --orange: #ffa500;
-  --cream: #fdf2ea;
-  --cream-2: #f6e4d6;
-  --ink: #392b1d;
-  --display: "Salsa Grande", "Arial Black", sans-serif;
-  --label: Taybenditos, "Arial Narrow", sans-serif;
-  --button: Signpainter, "Brush Script MT", cursive;
-  --body: instrument-sans-variable, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --address: americane, instrument-sans-variable, sans-serif;
   position: relative;
   isolation: isolate;
   display: grid;
@@ -19,7 +9,7 @@
   grid-template-areas: "top map" "list map";
   width: 100%;
   height: 720px;
-  background: var(--cream);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--body);
   text-align: left;
@@ -43,8 +33,8 @@
 /* Search + location + count */
 .edm-top {
   grid-area: top;
-  background: var(--cream);
-  border-right: 2px solid var(--blue);
+  background: var(--bg);
+  border-right: 2px solid var(--primary);
   z-index: 3;
 }
 .edm-search {
@@ -57,7 +47,7 @@
   padding: 0 44px;
   border: 0;
   border-radius: 0;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font: 500 15px var(--body);
   outline: none;
@@ -67,7 +57,7 @@
   box-shadow: none;
 }
 .edm-si::placeholder {
-  color: #9a8b7d;
+  color: var(--placeholder);
 }
 .edm-sico {
   position: absolute;
@@ -76,7 +66,7 @@
   width: 18px;
   height: 18px;
   transform: translateY(-50%);
-  fill: var(--blue);
+  fill: var(--primary);
   pointer-events: none;
 }
 .edm-clear {
@@ -88,7 +78,7 @@
   transform: translateY(-50%);
   font-size: 22px !important;
   line-height: 1;
-  color: var(--blue) !important;
+  color: var(--primary) !important;
   display: none;
 }
 .edm-clear.on {
@@ -101,10 +91,10 @@
   right: 16px;
   max-height: 320px;
   overflow-y: auto;
-  background: #fff;
-  border: 2px solid var(--blue);
+  background: var(--surface);
+  border: 2px solid var(--primary);
   border-top: 0;
-  box-shadow: 0 10px 24px rgba(57, 43, 29, 0.15);
+  box-shadow: 0 10px 24px var(--shadow-soft);
   z-index: 10;
   display: none;
 }
@@ -116,21 +106,21 @@
   font: 400 13px var(--label);
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--red);
+  color: var(--accent);
 }
 .edm-aci {
   display: block;
   width: 100%;
   text-align: left;
   padding: 9px 14px;
-  border-bottom: 1px solid var(--cream-2) !important;
+  border-bottom: 1px solid var(--line) !important;
 }
 .edm-aci:last-child {
   border-bottom: 0 !important;
 }
 .edm-aci:hover,
 .edm-aci.act {
-  background: var(--cream) !important;
+  background: var(--bg) !important;
 }
 .edm-acn {
   font: 400 19px var(--label);
@@ -139,12 +129,12 @@
 }
 .edm-aca {
   font: 400 13px var(--body);
-  color: #7d6c5c;
+  color: var(--muted);
   margin-top: 1px;
 }
 .edm-aci mark {
   background: none;
-  color: var(--blue);
+  color: var(--primary);
 }
 .edm-geo {
   display: flex !important;
@@ -154,8 +144,8 @@
   width: fit-content;
   margin: 0 auto 14px;
   padding: 12px 28px 8px !important;
-  background: var(--red) !important;
-  color: #fff !important;
+  background: var(--accent) !important;
+  color: var(--on-accent) !important;
   font: 400 22px var(--button) !important;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -177,14 +167,14 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px 8px;
-  background: var(--blue);
-  color: var(--cream);
+  background: var(--primary);
+  color: var(--bg);
   font: 400 16px var(--label);
   text-transform: uppercase;
 }
 .edm-cnt b {
   font-weight: 400;
-  color: #fff;
+  color: var(--on-primary);
 }
 .edm-sort {
   font-size: 13px;
@@ -198,8 +188,8 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-right: 2px solid var(--blue);
-  background: var(--cream);
+  border-right: 2px solid var(--primary);
+  background: var(--bg);
   z-index: 2;
 }
 .edm-list {
@@ -211,7 +201,7 @@
   width: 6px;
 }
 .edm-list::-webkit-scrollbar-thumb {
-  background: var(--blue);
+  background: var(--primary);
 }
 .edm-c {
   display: flex !important;
@@ -220,15 +210,15 @@
   width: 100%;
   text-align: left;
   padding: 14px 16px !important;
-  border-bottom: 1px solid var(--cream-2) !important;
+  border-bottom: 1px solid var(--line) !important;
   transition: background 0.15s;
 }
 .edm-c:hover {
-  background: #fff !important;
+  background: var(--surface) !important;
 }
 .edm-c.on {
-  background: var(--blue) !important;
-  color: #fff !important;
+  background: var(--primary) !important;
+  color: var(--on-primary) !important;
 }
 .edm-cico {
   flex-shrink: 0;
@@ -243,10 +233,10 @@
 .edm-cn {
   font: 400 22px/1.05 var(--label);
   text-transform: uppercase;
-  color: var(--blue);
+  color: var(--primary);
 }
 .edm-c.on .edm-cn {
-  color: #fff;
+  color: var(--on-primary);
 }
 .edm-ca {
   font: 300 15px/1.3 var(--address);
@@ -256,16 +246,16 @@
 .edm-cd {
   flex-shrink: 0;
   font: 400 15px var(--label);
-  color: var(--red);
+  color: var(--accent);
 }
 .edm-c.on .edm-cd {
-  color: #fff;
+  color: var(--on-primary);
 }
 .edm-empty {
   padding: 28px 16px;
   font: 400 15px var(--body);
   text-align: center;
-  color: #7d6c5c;
+  color: var(--muted);
 }
 .edm-more {
   display: none;
@@ -281,10 +271,10 @@
 .edm-map .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #f0f8ff;
+  background: var(--map-bg);
   font-family: var(--body);
 }
-/* Tint the grayscale Esri tiles and labels into the site's blues (filters defined in map.js). */
+/* Tint the grayscale Esri tiles and labels (filters built from the brand's mapTint). */
 .edm-map .leaflet-tile-pane {
   filter: url(#edm-land);
 }
@@ -299,15 +289,27 @@
 .edm-mk:hover {
   transform: scale(1.2);
 }
+.edm-pin-1 {
+  fill: var(--pin-1);
+}
+.edm-pin-2 {
+  fill: var(--pin-2);
+}
+.edm-c.on .edm-pin-1 {
+  fill: var(--pin-on-1);
+}
+.edm-c.on .edm-pin-2 {
+  fill: var(--pin-on-2);
+}
 .edm-cl {
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--red);
-  border: 3px solid var(--cream);
-  box-shadow: 0 3px 10px rgba(57, 43, 29, 0.3);
-  color: #fff;
+  background: var(--accent);
+  border: 3px solid var(--bg);
+  box-shadow: 0 3px 10px var(--shadow-strong);
+  color: var(--on-accent);
   font: 400 19px var(--label);
   padding-top: 2px;
   transition: transform 0.2s;
@@ -317,20 +319,20 @@
 }
 .edm-map .leaflet-popup-content-wrapper {
   border-radius: 0;
-  background: var(--blue);
-  color: #fff;
+  background: var(--primary);
+  color: var(--on-primary);
   padding: 0;
   box-shadow: -4px 6px 24px rgba(0, 0, 0, 0.25);
 }
 .edm-map .leaflet-popup-tip {
-  background: var(--blue);
+  background: var(--primary);
 }
 .edm-map .leaflet-popup-content {
   margin: 0;
   width: 280px !important;
 }
 .edm-map a.leaflet-popup-close-button {
-  color: #fff;
+  color: var(--on-primary);
   font-size: 22px;
   top: 6px;
   right: 6px;
@@ -341,19 +343,19 @@
 .edm-pt {
   font: 400 34px/1 var(--label);
   text-transform: uppercase;
-  color: #fff;
+  color: var(--on-primary);
   padding-right: 16px;
 }
 .edm-pa {
   font: 300 18px/1.3 var(--address);
-  color: #fff;
+  color: var(--on-primary);
   margin: 10px 0 16px;
 }
 .edm-po {
   display: inline-block;
   padding: 12px 22px 8px;
-  background: var(--cream);
-  color: var(--blue) !important;
+  background: var(--bg);
+  color: var(--primary) !important;
   font: 400 22px var(--button);
   text-transform: uppercase;
   text-decoration: none;
@@ -366,9 +368,9 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--accent);
   border: 3px solid #fff;
-  box-shadow: 0 0 0 6px rgba(255, 21, 26, 0.25);
+  box-shadow: 0 0 0 6px var(--me-halo);
 }
 .edm-load {
   position: absolute;
@@ -377,10 +379,10 @@
   align-items: center;
   justify-content: center;
   font: 400 22px var(--label);
-  color: var(--blue);
+  color: var(--primary);
   text-transform: uppercase;
   z-index: 1000;
-  background: var(--cream);
+  background: var(--bg);
   transition: opacity 0.3s;
 }
 .edm-load.off {
@@ -392,7 +394,7 @@
   font-size: 22px;
   text-transform: uppercase;
   text-align: center;
-  background: rgba(0, 143, 245, 0.75);
+  background: var(--gesture-overlay);
 }
 
 /* Mobile: search on top, map, then a collapsible list */
@@ -436,8 +438,8 @@
     display: block;
     width: 100%;
     padding: 14px 16px 10px !important;
-    background: var(--blue) !important;
-    color: #fff !important;
+    background: var(--primary) !important;
+    color: var(--on-primary) !important;
     font: 400 20px var(--button) !important;
     text-transform: uppercase;
   }

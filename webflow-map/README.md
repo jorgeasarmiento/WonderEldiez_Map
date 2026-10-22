@@ -1,20 +1,51 @@
-# Mapa de locales El Diez — Webflow
+# Mapas de locales para Webflow (multi-marca)
 
-Reemplaza el mapa de Google Maps de eldiezmexican.com (sección `#pickup`) por un mapa Leaflet que:
+Un solo motor de mapa (Leaflet) y una carpeta por marca. Cada marca genera su propio script y su propio Embed para Webflow; todas comparten las mismas funciones y arreglos.
+
+| Marca   | Sitio             | Contenedor    | Script                                                                              |
+| ------- | ----------------- | ------------- | ----------------------------------------------------------------------------------- |
+| El Diez | eldiezmexican.com | `#eldiez-map` | https://jorgeasarmiento.github.io/WonderEldiez_Map/webflow-map/public/eldiez-map.js |
+
+Qué hace el mapa:
 
 - **Agrupa los pines (clusters):** al alejar, los locales cercanos se juntan en una burbuja con el número; al acercar se separan. Desde zoom 15 se ven todos.
-- **Lee las tiendas del Google Sheet** (pestaña _Pickup_). Wonder actualiza el Sheet y el mapa cambia solo, sin tocar Webflow.
+- **Lee las tiendas del Google Sheet** de la marca. Se actualiza el Sheet y el mapa cambia solo, sin tocar Webflow.
+- Aparece al instante con la lista guardada (`locations.json`) y cambia a los datos del Sheet cuando llegan (límite de 8 s; si el Sheet falla se queda con la lista guardada).
 - Muestra **solo tiendas abiertas**: estado `Live` o fecha de lanzamiento ya pasada.
-- **Busca por zip, ciudad o nombre de tienda.** Zip o ciudad → ordena por distancia y muestra las más cercanas. Nombre → filtra lista y mapa.
+- **Busca por zip, ciudad o nombre de tienda.** Zip o ciudad → ordena por distancia. Nombre → filtra lista y mapa.
 - "Use my location" ordena por cercanía.
-- Botón **Pick up or delivery** con el link de pedido de cada tienda.
-- **Dos dedos para mover el mapa en el celular** y ctrl/⌘ + scroll en desktop, así el scroll de la página nunca queda atrapado.
-- Diseño con las fuentes y colores del sitio (Salsa Grande, Taybenditos, Signpainter, Americane; azul `#008FF5`, rojo `#FF151A`, crema `#FDF2EA`).
+- **Dos dedos para mover el mapa en el celular** y ctrl/⌘ + scroll en desktop.
 
-## Instalación en Webflow (una sola vez)
+## Estructura
 
-1. En el Designer, dentro de `#pickup`, borrar el div `#eldiez-map` (`tot-map-container`) y el aviso `#click` ("Click an icon to find…").
-2. En su lugar, agregar un **Embed** con el contenido de `paste/EMBED.html`:
+```
+webflow-map/
+  src/
+    map.js          motor compartido (lógica)
+    base.css        layout compartido; colores y fuentes vienen del tema de cada marca
+  brands/<id>/
+    brand.mjs       Sheet, columnas, textos, tamaño del pin, tono del mapa base, URL del script
+    theme.css       colores y fuentes (--primary, --accent, --bg, --pin-1, --label, …)
+    pin.svg         forma del pin (paths con clase edm-pin-1 / edm-pin-2)
+    locations.json  lista guardada: se muestra primero y es el respaldo
+    preview.html    página de prueba local; {{MAP}} se reemplaza por el mapa
+  build.mjs         genera lo de abajo para cada marca
+  public/<id>-map.js       script que sirve GitHub Pages (se commitea)
+  paste/<id>/EMBED.html    lo que se pega en Webflow
+  paste/<id>/preview.html  vista previa local
+```
+
+Regenerar después de cualquier cambio en `src/` o `brands/`:
+
+```bash
+vp run webflow:map
+```
+
+Probar en local: servir `webflow-map/` (por ejemplo `python3 -m http.server 4599 --directory webflow-map`) y abrir `http://127.0.0.1:4599/paste/<id>/preview.html`.
+
+## Instalación en Webflow (una vez por sitio)
+
+1. Donde va el mapa, agregar un **Embed** con el contenido de `paste/<id>/EMBED.html`. Para El Diez:
    ```html
    <div id="eldiez-map"></div>
    <script
@@ -22,40 +53,36 @@ Reemplaza el mapa de Google Maps de eldiezmexican.com (sección `#pickup`) por u
      defer
    ></script>
    ```
-3. Page Settings → Custom Code → _Before `</body>` tag_: borrar el `<script src="https://maps.googleapis.com/...">` y el script con `locations`, `newLocations` e `initMap`.
-4. Publicar en staging y revisar.
+2. Borrar el mapa anterior y sus scripts. En El Diez: el div `#eldiez-map` (`tot-map-container`), el aviso `#click`, el `<script src="https://maps.googleapis.com/...">` y el script con `locations`, `newLocations` e `initMap`.
+3. Publicar en staging y revisar.
 
-> **Hosting:** el script lo sirve GitHub Pages desde la rama `main` de `jorgeasarmiento/WonderEldiez_Map` (Settings → Pages → Deploy from a branch → `main` / root). El repo tiene que seguir público y con Pages activo.
+> **Hosting:** GitHub Pages sirve los scripts desde la rama `main` de `jorgeasarmiento/WonderEldiez_Map` (Settings → Pages → Deploy from a branch → `main` / root). El repo tiene que seguir público y con Pages activo. Después de un push, Pages publica en 1–2 minutos y los navegadores toman la versión nueva en máximo 10.
+
+## Agregar una marca
+
+1. Copiar `brands/eldiez/` a `brands/<id>/`.
+2. En `brand.mjs`: cambiar `id`, `name`, `scriptUrl` (`…/public/<id>-map.js`), `sheet`, `columns`, `text` y `mapTint`.
+3. En `theme.css`: colores y fuentes. En `pin.svg`: el pin. En `preview.html`: fuentes y fondo del sitio.
+4. Reemplazar `locations.json` con sus tiendas.
+5. `vp run webflow:map`, probar `paste/<id>/preview.html`, commit y push. El Embed queda en `paste/<id>/EMBED.html`.
 
 ## Cómo se actualiza
 
-| Qué cambia                                   | Qué hacer                                                           |
-| -------------------------------------------- | ------------------------------------------------------------------- |
-| Tiendas (alta, baja, dirección, link, fecha) | Editar el Google Sheet. Nada más.                                   |
-| Código o diseño del mapa                     | Editar `src/`, correr `vp run webflow:map`, commit y push a `main`. |
+| Qué cambia                                   | Qué hacer                                                            |
+| -------------------------------------------- | -------------------------------------------------------------------- |
+| Tiendas (alta, baja, dirección, link, fecha) | Editar el Google Sheet de la marca. Nada más.                        |
+| Diseño o textos de una marca                 | Editar `brands/<id>/`, `vp run webflow:map`, commit y push a `main`. |
+| Funciones del mapa (todas las marcas)        | Editar `src/`, `vp run webflow:map`, commit y push a `main`.         |
 
-Después de un push, GitHub Pages publica en 1–2 minutos y los navegadores toman la versión nueva en máximo 10 minutos. No hay caché que limpiar.
+## Formato del Sheet (El Diez)
 
-## Formato del Sheet
-
-Pestaña _Pickup_ (primera pestaña, `gid=0`). Columnas que usa el mapa, por nombre de encabezado:
+Pestaña _Pickup_ (`gid=0`). Columnas por nombre de encabezado (configurables en `brand.mjs → columns`):
 
 - `Launch Date`: `Live` o fecha (`4/22` o `5/8/2026`). Fechas futuras se ocultan hasta ese día.
 - `Location Title`, `Address`, `El Diez URL`: obligatorias; filas sin alguna de ellas se ignoran.
-- `Latitude`, `Longitude`: opcionales. Hoy esas columnas no tienen encabezado (el mapa usa las columnas F y G). Si faltan, usa las coordenadas guardadas en `locations.json`; si la tienda es nueva, geocodifica la dirección.
+- `Latitude`, `Longitude`: opcionales. Hoy esas columnas no tienen encabezado (el mapa usa las columnas F y G). Si faltan, usa las coordenadas de `locations.json`; si la tienda es nueva, geocodifica la dirección.
 
-El Sheet tiene que seguir compartido como "cualquier persona con el link puede ver".
-
-## Archivos
-
-| Archivo                     | Qué es                                                                                                     |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `src/map.js`, `src/map.css` | Código fuente del mapa.                                                                                    |
-| `locations.json`            | Respaldo: si el Sheet no responde se usa esta lista, y de acá salen las coordenadas que el Sheet no tiene. |
-| `build.mjs`                 | Genera `public/eldiez-map.js`, `paste/EMBED.html` y `paste/preview.html`.                                  |
-| `public/eldiez-map.js`      | El archivo que sirve GitHub Pages. Se commitea.                                                            |
-
-Probar en local: servir la carpeta `webflow-map/` (por ejemplo `python3 -m http.server 4599 --directory webflow-map`) y abrir `http://127.0.0.1:4599/paste/preview.html`.
+El Sheet tiene que estar compartido como "cualquier persona con el link puede ver".
 
 ## Servicios externos (todos sin API key)
 

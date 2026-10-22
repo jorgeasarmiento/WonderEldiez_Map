@@ -1,0 +1,27 @@
+/* El Diez theme: colors and fonts eldiezmexican.com already loads. Layout lives in src/base.css. */
+.edm {
+  --primary: #008ff5;
+  --accent: #ff151a;
+  --bg: #fdf2ea;
+  --line: #f6e4d6;
+  --ink: #392b1d;
+  --muted: #7d6c5c;
+  --placeholder: #9a8b7d;
+  --surface: #fff;
+  --on-primary: #fff;
+  --on-accent: #fff;
+  --map-bg: #f0f8ff;
+  --shadow-soft: rgba(57, 43, 29, 0.15);
+  --shadow-strong: rgba(57, 43, 29, 0.3);
+  --me-halo: rgba(255, 21, 26, 0.25);
+  --gesture-overlay: rgba(0, 143, 245, 0.75);
+  --pin-1: #ff151a;
+  --pin-2: #ffa500;
+  --pin-on-1: #fff;
+  --pin-on-2: rgba(255, 255, 255, 0.6);
+
+  --label: Taybenditos, "Arial Narrow", sans-serif;
+  --button: Signpainter, "Brush Script MT", cursive;
+  --body: instrument-sans-variable, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --address: americane, instrument-sans-variable, sans-serif;
+}

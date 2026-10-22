@@ -1,8 +1,14 @@
-// El Diez locations map. One <script> + one container in Webflow:
-//   <div id="eldiez-map"></div><script src=".../eldiez-map.js" defer></script>
-// Stores come from the Google Sheet ("Pickup" tab); the bundled list is the fallback if the Sheet fails.
+// Store locations map shared by every brand (see brands/<id>/). One <script> + one container in Webflow:
+//   <div id="<id>-map"></div><script src=".../<id>-map.js" defer></script>
+// Stores come from the brand's Google Sheet; the bundled list shows first and is the fallback if the Sheet fails.
 (() => {
-  const root = document.querySelector("[data-eldiez-map], #eldiez-map");
+  // Replaced at build time.
+  const BRAND = __BRAND__;
+  const CSS = __CSS__;
+  const FALLBACK = __FALLBACK__; // [name, address, lat, lng, orderUrl]
+  const PIN_SVG = __PIN__; // { viewBox, paths }
+
+  const root = document.querySelector(`[data-${BRAND.id}-map], #${BRAND.id}-map`);
   if (!root || root.dataset.edmReady) return;
   root.dataset.edmReady = "1";
   // Webflow wraps embeds in a .w-embed div that shrinks to content inside flex parents
@@ -13,10 +19,11 @@
     wrapper.style.alignSelf = "stretch";
   }
 
-  // Replaced at build time.
-  const CSS = __CSS__;
-  const FALLBACK = __FALLBACK__; // [name, address, lat, lng, orderUrl]
-  const SHEET_CSV = root.dataset.sheet || __SHEET__;
+  const SHEET_CSV =
+    root.dataset.sheet ||
+    `https://docs.google.com/spreadsheets/d/${BRAND.sheet.id}/export?format=csv&gid=${BRAND.sheet.gid}`;
+  const LOG = `[${BRAND.name} map]`;
+  const T = (key, vars = {}) => BRAND.text[key].replace(/\{(\w+)\}/g, (_, k) => vars[k]);
 
   const CDN = {
     leafletCss: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
@@ -34,13 +41,10 @@
   const TILES = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_";
   const GEOCODER = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/";
 
-  const CHILI =
-    '<path d="M27.5982 37.5043C33.6828 37.4272 26.6733 42.2968 24.1191 42.4217C16.5589 44.1778 7.68067 40.4213 3.98696 33.7515C0.422388 26.9182-3.38146 13.4978 5.26884 9.00657C5.26884 9.00657 7.72055 7.84381 11.1484 8.55836C16.1904 9.61091 17.6394 16.0695 16.6158 20.5148C14.8364 28.2445 19.455 37.6054 27.5963 37.5025L27.5982 37.5043Z" fill="F1"/><path d="M13.3922 2.346C11.9812 3.86696 10.8379 5.62305 9.93777 7.46914C9.03761 9.34095 8.43181 11.3505 8.25899 13.4115C8.14885 14.4861 6.56501 14.4273 6.54222 13.3436C6.55551 12.7723 6.5783 12.1973 6.64666 11.6297C7.03218 8.21491 8.39761 4.9489 10.3138 2.07414C10.6195 1.61675 10.9481 1.16303 11.2975 0.731353C11.3526 0.663388 11.4494 0.551343 11.5045 0.485214C11.9755-0.0768792 12.8301-0.163212 13.4112 0.292341C14.0873 0.808512 14.074 1.84269 13.3903 2.346H13.3922Z" fill="F2"/>';
-  const chili = (w, h, f1, f2) =>
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 31 43">${CHILI.replace("F1", f1).replace("F2", f2)}</svg>`;
-  const PIN = chili(30, 41, "#FF151A", "#FFA500");
-  const PIN_LIST = chili(18, 25, "#FF151A", "#FFA500");
-  const PIN_LIST_ON = chili(18, 25, "#fff", "rgba(255,255,255,.6)");
+  const pinSvg = ({ width, height }) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${PIN_SVG.viewBox}">${PIN_SVG.paths}</svg>`;
+  const PIN = pinSvg(BRAND.pin);
+  const PIN_LIST = pinSvg(BRAND.listPin);
   const ICON_SEARCH =
     '<svg class="edm-sico" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
   const ICON_GEO =
@@ -152,12 +156,14 @@
       const i = header.findIndex((h) => re.test(h.trim()));
       return i < 0 ? fallback : i;
     };
-    const iName = col(/title|name/i, 1),
-      iAddr = col(/address/i, 2),
-      iUrl = col(/el diez/i, 3);
-    const iStatus = col(/launch|status/i, 0),
-      iLat = col(/^lat/i, 5),
-      iLng = col(/^(lng|lon)/i, 6);
+    const c = BRAND.columns,
+      byCol = (k) => col(new RegExp(c[k].match, "i"), c[k].fallback);
+    const iStatus = byCol("status"),
+      iLat = byCol("lat"),
+      iLng = byCol("lng");
+    const iName = byCol("name"),
+      iAddr = byCol("address"),
+      iUrl = byCol("url");
     const today = new Date();
     const stores = [],
       missing = [];
@@ -178,7 +184,7 @@
     for (const s of missing.slice(0, 25)) {
       const p = await geocodeAddress(s.address).catch(() => null);
       if (p) stores.push(Object.assign(s, p));
-      else console.warn("[El Diez map] No coordinates for", s.name, "-", s.address);
+      else console.warn(LOG, "No coordinates for", s.name, "-", s.address);
     }
     if (stores.length < FALLBACK.length / 2) throw new Error("Sheet returned too few stores");
     return stores;
@@ -188,6 +194,11 @@
     FALLBACK.map(([name, address, lat, lng, url]) => ({ name, address, lat, lng, url }));
 
   // ---------- markup ----------
+  // Grayscale → brand colors: each channel maps gray 0→1 through the brand's lookup table.
+  const tintFilter = (id, t) =>
+    `<filter id="${id}" color-interpolation-filters="sRGB">` +
+    '<feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>' +
+    `<feComponentTransfer><feFuncR type="table" tableValues="${t.r}"/><feFuncG type="table" tableValues="${t.g}"/><feFuncB type="table" tableValues="${t.b}"/></feComponentTransfer></filter>`;
   const style = document.createElement("style");
   style.textContent = CSS;
   document.head.appendChild(style);
@@ -195,27 +206,19 @@
   root.innerHTML = `
     <div class="edm-top">
       <div class="edm-search">
-        <input class="edm-si" type="text" placeholder="Search by zip, city or store" autocomplete="off" aria-label="Search by zip, city or store">
+        <input class="edm-si" type="text" placeholder="${esc(T("searchPlaceholder"))}" autocomplete="off" aria-label="${esc(T("searchPlaceholder"))}">
         ${ICON_SEARCH}
-        <button type="button" class="edm-clear" aria-label="Clear search">&times;</button>
+        <button type="button" class="edm-clear" aria-label="${esc(T("clearSearch"))}">&times;</button>
         <div class="edm-ac" role="listbox"></div>
       </div>
-      <button type="button" class="edm-geo">${ICON_GEO}<span>Use my location</span></button>
-      <div class="edm-cnt"><span><b class="edm-n">0</b> <span class="edm-nl">locations</span></span><span class="edm-sort"></span></div>
+      <button type="button" class="edm-geo">${ICON_GEO}<span>${esc(T("useLocation"))}</span></button>
+      <div class="edm-cnt"><span><b class="edm-n">0</b> <span class="edm-nl">${esc(T("locations"))}</span></span><span class="edm-sort"></span></div>
     </div>
     <div class="edm-listw"><div class="edm-list"></div><button type="button" class="edm-more"></button></div>
-    <div class="edm-map"><div class="edm-mapc"></div><div class="edm-load">Loading locations…</div></div>
+    <div class="edm-map"><div class="edm-mapc"></div><div class="edm-load">${esc(T("loading"))}</div></div>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-      <!-- Esri grays: water ~0.82, land ~0.92, roads 1. Water → mid blue, land → near-white blue. -->
-      <filter id="edm-land" color-interpolation-filters="sRGB">
-        <feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>
-        <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 0 0 .1 .3 .68 .93 1"/><feFuncG type="table" tableValues=".35 .4 .45 .5 .55 .6 .65 .7 .84 .965 1"/><feFuncB type="table" tableValues=".6 .65 .7 .75 .8 .85 .9 .93 .98 1 1"/></feComponentTransfer>
-      </filter>
-      <!-- Label text (~0.19) → dark navy #003A73, white halo stays white. -->
-      <filter id="edm-labels" color-interpolation-filters="sRGB">
-        <feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>
-        <feComponentTransfer><feFuncR type="table" tableValues="0 0 0 0 .15 .3 .45 .6 .75 .9 1"/><feFuncG type="table" tableValues=".2 .22 .227 .227 .33 .44 .55 .66 .77 .89 1"/><feFuncB type="table" tableValues=".4 .43 .45 .45 .53 .61 .69 .77 .85 .93 1"/></feComponentTransfer>
-      </filter>
+      ${tintFilter("edm-land", BRAND.mapTint.land)}
+      ${tintFilter("edm-labels", BRAND.mapTint.labels)}
     </svg>`;
   const $ = (sel) => root.querySelector(sel);
   const input = $(".edm-si"),
@@ -249,7 +252,7 @@
   function popup(s) {
     return (
       `<div class="edm-pop"><div class="edm-pt">${esc(s.name)}</div><div class="edm-pa">${esc(s.address)}</div>` +
-      `<a class="edm-po" href="${esc(s.url)}" target="_blank" rel="noopener">Pick up or delivery</a></div>`
+      `<a class="edm-po" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(T("order"))}</a></div>`
     );
   }
 
@@ -258,8 +261,8 @@
     if (origin) items.sort((a, b) => miles(origin, a) - miles(origin, b));
     else items.sort((a, b) => a.name.localeCompare(b.name));
     $(".edm-n").textContent = items.length;
-    $(".edm-nl").textContent = items.length === 1 ? "location" : "locations";
-    $(".edm-sort").textContent = origin ? `Nearest to ${originLabel}` : "A → Z";
+    $(".edm-nl").textContent = T(items.length === 1 ? "location" : "locations");
+    $(".edm-sort").textContent = origin ? T("nearestTo", { label: originLabel }) : T("sortAZ");
     list.innerHTML = items.length
       ? items
           .map(
@@ -270,23 +273,19 @@
               "</button>",
           )
           .join("")
-      : '<div class="edm-empty">No stores match. Press Enter to search that area.</div>';
+      : `<div class="edm-empty">${esc(T("noMatch"))}</div>`;
     more.style.display = items.length > 3 ? "" : "none";
     more.textContent = root.classList.contains("collapsed")
-      ? `View all ${items.length} locations`
-      : "Show less";
+      ? T("viewAll", { n: items.length })
+      : T("showLess");
     list.scrollTop = 0;
   }
 
   function markActive(s) {
-    list.querySelectorAll(".edm-c.on").forEach((e) => {
-      e.classList.remove("on");
-      e.querySelector(".edm-cico").innerHTML = PIN_LIST;
-    });
+    list.querySelectorAll(".edm-c.on").forEach((e) => e.classList.remove("on"));
     const card = list.querySelector(`[data-id="${s.id}"]`);
     if (!card) return;
     card.classList.add("on");
-    card.querySelector(".edm-cico").innerHTML = PIN_LIST_ON;
     list.scrollTop =
       card.offsetTop - list.offsetTop - list.clientHeight / 2 + card.clientHeight / 2;
   }
@@ -395,9 +394,9 @@
     if (!acItems.length) return closeAC();
     let html = "";
     acItems.forEach((it, i) => {
-      if (i === 0 && it.type === "store") html += '<div class="edm-ach">Stores</div>';
+      if (i === 0 && it.type === "store") html += `<div class="edm-ach">${esc(T("stores"))}</div>`;
       if (it.type === "place" && (i === 0 || acItems[i - 1].type === "store"))
-        html += '<div class="edm-ach">Search near</div>';
+        html += `<div class="edm-ach">${esc(T("searchNear"))}</div>`;
       html +=
         it.type === "store"
           ? `<button type="button" class="edm-aci" data-i="${i}"><div class="edm-acn">${hl(it.s.name, q)}</div><div class="edm-aca">${hl(it.s.address, q)}</div></button>`
@@ -436,7 +435,7 @@
     ).catch(() => ({}));
     const c = j.candidates && j.candidates[0];
     if (!c) {
-      list.innerHTML = `<div class="edm-empty">We couldn't find “${esc(text)}”. Try a zip code or city.</div>`;
+      list.innerHTML = `<div class="edm-empty">${esc(T("notFound", { q: text }))}</div>`;
       return;
     }
     input.value = c.address.replace(/, USA$/, "");
@@ -516,20 +515,20 @@
   geoBtn.addEventListener("click", () => {
     touched = true;
     if (!navigator.geolocation) {
-      geoLabel.textContent = "Location not supported";
+      geoLabel.textContent = T("locationUnsupported");
       return;
     }
-    geoLabel.textContent = "Locating…";
+    geoLabel.textContent = T("locating");
     navigator.geolocation.getCurrentPosition(
       (p) => {
-        geoLabel.textContent = "Use my location";
+        geoLabel.textContent = T("useLocation");
         input.value = "";
         clearBtn.classList.add("on");
-        setOrigin({ lat: p.coords.latitude, lng: p.coords.longitude }, "you");
+        setOrigin({ lat: p.coords.latitude, lng: p.coords.longitude }, T("you"));
       },
       () => {
-        geoLabel.textContent = "Location blocked";
-        setTimeout(() => (geoLabel.textContent = "Use my location"), 2500);
+        geoLabel.textContent = T("locationBlocked");
+        setTimeout(() => (geoLabel.textContent = T("useLocation")), 2500);
       },
       { timeout: 10000 },
     );
@@ -549,9 +548,9 @@
       gestureHandling: true,
       gestureHandlingOptions: {
         text: {
-          touch: "Use two fingers to move the map",
-          scroll: "Use ctrl + scroll to zoom the map",
-          scrollMac: "Use ⌘ + scroll to zoom the map",
+          touch: T("gestureTouch"),
+          scroll: T("gestureScroll"),
+          scrollMac: T("gestureScrollMac"),
         },
       },
     }).setView([40.4, -74.5], 7);
@@ -584,9 +583,9 @@
 
     pinIcon = L.divIcon({
       html: `<div class="edm-mk">${PIN}</div>`,
-      iconSize: [30, 41],
-      iconAnchor: [15, 41],
-      popupAnchor: [0, -38],
+      iconSize: [BRAND.pin.width, BRAND.pin.height],
+      iconAnchor: [BRAND.pin.width / 2, BRAND.pin.height],
+      popupAnchor: [0, 3 - BRAND.pin.height],
       className: "",
     });
     map.on("dragstart", () => (touched = true));
@@ -601,12 +600,12 @@
         if (touched) pendingStores = fresh;
         else setStores(fresh);
       },
-      (err) => console.warn("[El Diez map] Sheet unavailable, using bundled store list:", err),
+      (err) => console.warn(LOG, "Sheet unavailable, using bundled store list:", err),
     );
   }
 
   init().catch((err) => {
-    console.error("[El Diez map]", err);
-    $(".edm-load").textContent = "Map unavailable";
+    console.error(LOG, err);
+    $(".edm-load").textContent = T("unavailable");
   });
 })();

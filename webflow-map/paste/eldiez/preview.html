@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>El Diez Map Preview</title>
+    <!-- Local stand-in for eldiezmexican.com: the site's own display fonts and colors. -->
+    <style>
+      @font-face {
+        font-family: Taybenditos;
+        src: url(https://cdn.prod.website-files.com/698a4478458090608a9619fd/698bcb2a13df46b7e0b992c2_TAYBenditos.otf)
+          format("opentype");
+      }
+      @font-face {
+        font-family: "Salsa Grande";
+        src: url(https://cdn.prod.website-files.com/698a4478458090608a9619fd/698bcb2a228adc2e2917e687_Salsa-Grande-Regular.otf)
+          format("opentype");
+      }
+      body {
+        margin: 0;
+        background: #fdf2ea;
+      }
+      section {
+        padding: 60px 40px;
+        background: #fdf2ea;
+        font-family: Taybenditos, sans-serif;
+        color: #008ff5;
+      }
+    </style>
+  </head>
+  <body>
+    <section>
+      <div style="font-size: 64px; line-height: 1">MUNCH FIRST,<br />TALK LATER!</div>
+      <div style="font-size: 30px; color: #ff151a; margin-top: 12px">
+        DELIVERY OR PICKUP AT WONDER
+      </div>
+    </section>
+    <div id="eldiez-map"></div>
+    <script src="../../public/eldiez-map.js" defer></script>
+    <section><div style="font-size: 40px; color: #ff151a">OR FIND US AT:</div></section>
+    <section><div style="height: 60vh"></div></section>
+  </body>
+</html>
