@@ -202,7 +202,7 @@
   const style = document.createElement("style");
   style.textContent = CSS;
   document.head.appendChild(style);
-  root.classList.add("edm", "collapsed");
+  root.classList.add("edm");
   root.innerHTML = `
     <div class="edm-top">
       <div class="edm-search">
@@ -214,7 +214,7 @@
       <button type="button" class="edm-geo">${ICON_GEO}<span>${esc(T("useLocation"))}</span></button>
       <div class="edm-cnt"><span><b class="edm-n">0</b> <span class="edm-nl">${esc(T("locations"))}</span></span><span class="edm-sort"></span></div>
     </div>
-    <div class="edm-listw"><div class="edm-list"></div><button type="button" class="edm-more"></button></div>
+    <div class="edm-listw"><div class="edm-list"></div></div>
     <div class="edm-map"><div class="edm-mapc"></div><div class="edm-load">${esc(T("loading"))}</div></div>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       ${tintFilter("edm-land", BRAND.mapTint.land)}
@@ -225,8 +225,7 @@
     ac = $(".edm-ac"),
     clearBtn = $(".edm-clear"),
     list = $(".edm-list");
-  const more = $(".edm-more"),
-    geoBtn = $(".edm-geo"),
+  const geoBtn = $(".edm-geo"),
     geoLabel = $(".edm-geo span");
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
@@ -282,10 +281,6 @@
           )
           .join("")
       : `<div class="edm-empty">${esc(T(outOfView ? "noneInView" : "noMatch"))}</div>`;
-    more.style.display = items.length > 3 ? "" : "none";
-    more.textContent = root.classList.contains("collapsed")
-      ? T("viewAll", { n: items.length })
-      : T("showLess");
     list.scrollTop = 0;
     const active = stores[activeId];
     if (active) markActive(active);
@@ -517,12 +512,6 @@
     if (!card) return;
     touched = true;
     select(stores[+card.dataset.id]);
-  });
-  more.addEventListener("click", () => {
-    root.classList.toggle("collapsed");
-    renderList();
-    if (root.classList.contains("collapsed"))
-      list.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
   geoBtn.addEventListener("click", () => {
     touched = true;

@@ -32,8 +32,6 @@ export default {
     sortAZ: "A → Z",
     nearestTo: "Nearest to {label}",
     you: "you",
-    viewAll: "View all {n} locations",
-    showLess: "Show less",
     stores: "Stores",
     searchNear: "Search near",
     noMatch: "No stores match. Press Enter to search that area.",

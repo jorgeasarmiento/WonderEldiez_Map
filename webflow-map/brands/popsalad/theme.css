@@ -70,11 +70,6 @@
   font-size: 18px;
   padding: 12px 24px;
 }
-.edm .edm-more {
-  font-style: italic !important;
-  font-weight: 800 !important;
-}
-
 /* List area white too, so the strip beside the scrollbar isn't yellow. */
 .edm .edm-listw {
   background: var(--surface);

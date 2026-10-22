@@ -257,10 +257,6 @@
   text-align: center;
   color: var(--muted);
 }
-.edm-more {
-  display: none;
-}
-
 /* Map, pins, clusters, popup */
 .edm-map {
   grid-area: map;
@@ -397,7 +393,7 @@
   background: var(--gesture-overlay);
 }
 
-/* Mobile: search on top, map, then a collapsible list */
+/* Mobile: search on top, map, then a scrollable list */
 @media (max-width: 768px) {
   .edm {
     grid-template-columns: 1fr;
@@ -429,19 +425,6 @@
   }
   .edm-list {
     max-height: 330px;
-  }
-  .edm.collapsed .edm-list {
-    max-height: 258px;
-    overflow: hidden;
-  }
-  .edm-more {
-    display: block;
-    width: 100%;
-    padding: 14px 16px 10px !important;
-    background: var(--primary) !important;
-    color: var(--on-primary) !important;
-    font: 400 20px var(--button) !important;
-    text-transform: uppercase;
   }
   .edm-pt {
     font-size: 30px;
