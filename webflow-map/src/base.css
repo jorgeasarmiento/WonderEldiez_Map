@@ -270,13 +270,6 @@
   background: var(--map-bg);
   font-family: var(--body);
 }
-/* Tint the grayscale Esri tiles and labels (filters built from the brand's mapTint). */
-.edm-map .leaflet-tile-pane {
-  filter: url(#edm-land);
-}
-.edm-map .leaflet-shadow-pane {
-  filter: url(#edm-labels);
-}
 .edm-mk {
   cursor: pointer;
   transition: transform 0.2s;
@@ -431,8 +424,16 @@
   .edm-list {
     max-height: 330px;
   }
+  /* Compact store card so it fits the 380px mobile map with room for the close button. */
+  .edm-pop {
+    padding: 16px 18px 16px;
+  }
   .edm-pt {
-    font-size: 30px;
+    font-size: 26px;
+  }
+  .edm-pa {
+    font-size: 16px;
+    margin: 8px 0 12px;
   }
   .edm-map .leaflet-popup-content {
     width: 240px !important;

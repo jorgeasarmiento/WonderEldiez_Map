@@ -84,6 +84,22 @@
     });
   const getJson = (url) => fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(r.status)));
 
+  // Brand tint: gray (average of r,g,b) → each channel through the brand's 11-step table, linearly
+  // interpolated (same math as an SVG feFuncTable). Precomputed for all 256 gray levels.
+  const tintLut = (t) => {
+    const lut = new Uint8ClampedArray(256 * 3);
+    [t.r, t.g, t.b].forEach((list, ch) => {
+      const v = list.trim().split(/\s+/).map(Number),
+        n = v.length - 1;
+      for (let i = 0; i < 256; i++) {
+        const x = Math.min((i / 255) * n, n),
+          k = Math.min(Math.floor(x), n - 1);
+        lut[i * 3 + ch] = Math.round((v[k] + (x - k) * (v[k + 1] - v[k])) * 255);
+      }
+    });
+    return lut;
+  };
+
   function parseCsv(text) {
     const rows = [];
     let row = [],
@@ -194,11 +210,6 @@
     FALLBACK.map(([name, address, lat, lng, url]) => ({ name, address, lat, lng, url }));
 
   // ---------- markup ----------
-  // Grayscale → brand colors: each channel maps gray 0→1 through the brand's lookup table.
-  const tintFilter = (id, t) =>
-    `<filter id="${id}" color-interpolation-filters="sRGB">` +
-    '<feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>' +
-    `<feComponentTransfer><feFuncR type="table" tableValues="${t.r}"/><feFuncG type="table" tableValues="${t.g}"/><feFuncB type="table" tableValues="${t.b}"/></feComponentTransfer></filter>`;
   const style = document.createElement("style");
   style.textContent = CSS;
   document.head.appendChild(style);
@@ -215,11 +226,7 @@
       <div class="edm-cnt"><span><b class="edm-n">0</b> <span class="edm-nl">${esc(T("locations"))}</span></span><span class="edm-sort"></span></div>
     </div>
     <div class="edm-listw"><div class="edm-list"></div></div>
-    <div class="edm-map"><div class="edm-mapc"></div><div class="edm-load">${esc(T("loading"))}</div></div>
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-      ${tintFilter("edm-land", BRAND.mapTint.land)}
-      ${tintFilter("edm-labels", BRAND.mapTint.labels)}
-    </svg>`;
+    <div class="edm-map"><div class="edm-mapc"></div><div class="edm-load">${esc(T("loading"))}</div></div>`;
   const $ = (sel) => root.querySelector(sel);
   const input = $(".edm-si"),
     ac = $(".edm-ac"),
@@ -364,7 +371,7 @@
     stores.forEach((s, i) => (s.id = i));
     markers = stores.map((s) =>
       L.marker([s.lat, s.lng], { icon: pinIcon, title: s.name, alt: s.name })
-        .bindPopup(popup(s), { maxWidth: 300 })
+        .bindPopup(popup(s), { maxWidth: 300, autoPanPadding: [16, 16] })
         .on("click", () => {
           touched = true;
           markActive(s);
@@ -556,11 +563,45 @@
       },
     }).setView([40.4, -74.5], 7);
     L.control.zoom({ position: "bottomright" }).addTo(map);
-    L.tileLayer(TILES + "Base/MapServer/tile/{z}/{y}/{x}", {
+    // Esri's grayscale tiles are recolored pixel by pixel in a canvas. (A CSS/SVG filter on the
+    // tile pane looked the same but Safari ignores SVG filters there, leaving the map gray.)
+    const TintedTiles = L.GridLayer.extend({
+      createTile(coords, done) {
+        const tile = document.createElement("canvas"),
+          size = this.getTileSize(),
+          img = new Image();
+        tile.width = size.x;
+        tile.height = size.y;
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const ctx = tile.getContext("2d", { willReadFrequently: true });
+          ctx.drawImage(img, 0, 0, size.x, size.y);
+          const data = ctx.getImageData(0, 0, size.x, size.y),
+            px = data.data,
+            lut = this.options.lut;
+          for (let i = 0; i < px.length; i += 4) {
+            const g = Math.round(0.33 * (px[i] + px[i + 1] + px[i + 2])) * 3;
+            px[i] = lut[g];
+            px[i + 1] = lut[g + 1];
+            px[i + 2] = lut[g + 2];
+          }
+          ctx.putImageData(data, 0, 0);
+          done(null, tile);
+        };
+        img.onerror = () => done(new Error("tile failed"), tile);
+        img.src = L.Util.template(this.options.url, coords);
+        return tile;
+      },
+    });
+    new TintedTiles({
+      url: TILES + "Base/MapServer/tile/{z}/{y}/{x}",
+      lut: tintLut(BRAND.mapTint.land),
       attribution: "Tiles &copy; Esri",
       maxZoom: 16,
     }).addTo(map);
-    L.tileLayer(TILES + "Reference/MapServer/tile/{z}/{y}/{x}", {
+    new TintedTiles({
+      url: TILES + "Reference/MapServer/tile/{z}/{y}/{x}",
+      lut: tintLut(BRAND.mapTint.labels),
       maxZoom: 16,
       pane: "shadowPane",
     }).addTo(map);
@@ -590,6 +631,39 @@
       className: "",
     });
     map.on("dragstart", () => (touched = true));
+    // Leaflet's autoPan can miss when the popup opens mid-zoom (e.g. from the list), leaving its top
+    // and close button cut off on short mobile maps. Whenever the map settles with a popup open,
+    // nudge it fully into view (our own panBy settles once more and then finds nothing to fix).
+    let openPopup = null,
+      userDragged = false;
+    const keepPopupInView = () => {
+      const el = openPopup && openPopup.getElement();
+      if (!el) return;
+      const box = map.getContainer().getBoundingClientRect(),
+        p = el.getBoundingClientRect(),
+        pad = 12;
+      let dx = 0,
+        dy = 0;
+      if (p.top < box.top + pad) dy = p.top - box.top - pad;
+      else if (p.bottom > box.bottom - pad) dy = p.bottom - box.bottom + pad;
+      if (p.left < box.left + pad) dx = p.left - box.left - pad;
+      else if (p.right > box.right - pad) dx = p.right - box.right + pad;
+      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) map.panBy([dx, dy]);
+    };
+    map.on("dragstart", () => (userDragged = true));
+    map.on("popupopen", (e) => {
+      openPopup = e.popup;
+      userDragged = false;
+      setTimeout(keepPopupInView, 300);
+    });
+    map.on("popupclose", (e) => {
+      if (openPopup === e.popup) openPopup = null;
+    });
+    map.on("moveend", () => {
+      // Leave it alone when the visitor dragged the map away on purpose.
+      if (userDragged) userDragged = false;
+      else setTimeout(keepPopupInView, 50);
+    });
     if (BRAND.listFollowsMap) map.on("moveend", renderList);
 
     // Show the bundled list right away, then swap in the Sheet when it arrives.
