@@ -3,7 +3,7 @@
 export default {
   id: "eldiez", // → public/eldiez-map.js, container #eldiez-map
   name: "El Diez", // used in console messages
-  scriptUrl: "https://jorgeasarmiento.github.io/WonderEldiez_Map/webflow-map/public/eldiez-map.js",
+  scriptUrl: "https://jorgeasarmiento.github.io/Wonder_Maps/webflow-map/public/eldiez-map.js",
 
   // "Pickup" tab of the stores sheet, shared as "anyone with the link can view".
   sheet: { id: "1TzDvvtenMzvmn6xlU-kiehZotL1nPmWW2yoGZYJ09gk", gid: 0 },

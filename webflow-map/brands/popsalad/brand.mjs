@@ -3,8 +3,7 @@
 export default {
   id: "popsalad", // → public/popsalad-map.js, container #popsalad-map
   name: "Pop Salad", // used in console messages
-  scriptUrl:
-    "https://jorgeasarmiento.github.io/WonderEldiez_Map/webflow-map/public/popsalad-map.js",
+  scriptUrl: "https://jorgeasarmiento.github.io/Wonder_Maps/webflow-map/public/popsalad-map.js",
 
   // Same stores sheet as El Diez ("Pickup" tab); Pop Salad has its own URL column.
   sheet: { id: "1TzDvvtenMzvmn6xlU-kiehZotL1nPmWW2yoGZYJ09gk", gid: 0 },
